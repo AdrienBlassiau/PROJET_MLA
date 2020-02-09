@@ -69,11 +69,19 @@ CCFLAGSCPLEX = $(CCFLAGS) -I$(CPLEXINCDIR) -I$(CONCERTINCDIR)  -DIL_STD #DIL_STD
 # ---------------------------------------------------------------------
 # Main compilation and linking commands
 # ---------------------------------------------------------------------
-all:cplexdirexists test
+all:cplexdirexists exo1
 cplexdirexists:
 	if [ -d "$(CPLEX)" ]; then echo -e "\nCplex dir found. I'll compile main if not already compiled."; else echo -e "\n\nCplex dir not found!!!!! \nPlease set add a line like below on \nCPLEX=/path/to/your/cplex/install/folder/\nat the beginning of this Makefile"; exit 1; fi
-test:CuttingPlanesEngine.o src/test.cpp
-	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/test.cpp -o test $(CCLNFLAGSCPLEX)
+tp1:CuttingPlanesEngine.o src/tp1.cpp
+	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/tp1.cpp -o tp1 $(CCLNFLAGSCPLEX)
+tp2_1:CuttingPlanesEngine.o src/tp2_1.cpp
+	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/tp2_1.cpp -o tp2_1 $(CCLNFLAGSCPLEX)
+tp2_2:CuttingPlanesEngine.o src/tp2_2.cpp
+	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/tp2_2.cpp -o tp2_2 $(CCLNFLAGSCPLEX)
+tp3:CuttingPlanesEngine.o src/tp3.cpp
+	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/tp3.cpp -o tp3 $(CCLNFLAGSCPLEX)
+tp4:CuttingPlanesEngine.o src/tp4.cpp
+	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/tp4.cpp -o tp4 $(CCLNFLAGSCPLEX)
 CuttingPlanesEngine.o : src/CuttingPlanesEngine.cpp src/CuttingPlanesEngine.h
 	$(CCC) -c $(CCFLAGSCPLEX) src/CuttingPlanesEngine.cpp -o CuttingPlanesEngine.o
 
