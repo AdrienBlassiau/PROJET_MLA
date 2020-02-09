@@ -1,6 +1,6 @@
 # TP MLA (disponible aussi à cette [adresse](https://github.com/AdrienBlassiau/PROJET_MLA/tree/master/cplexbenders))
 
-Nous vous conseillons de  lire ce rapport sous https://dillinger.io/ par exemple pour une meilleure lisibilité.
+Nous vous conseillons de  lire ce rapport sous https://dillinger.io/ par exemple pour une meilleure lisibilité (ou directement sur le github du projet).
 
 # 1. Conseils d'utilisation
 
