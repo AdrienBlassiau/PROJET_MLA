@@ -1,3 +1,7 @@
+//////////////////////////////////////////
+// TP Décomposition de Benders manuelle //
+//////////////////////////////////////////
+
 #include "CuttingPlanesEngine.h"
 #include <iostream>
 #include <cstdlib>

@@ -1,3 +1,7 @@
+//////////////////////////////////
+// TP Décomposition automatique //
+//////////////////////////////////
+
 #include "CuttingPlanesEngine.h"
 #include <iostream>
 #include <cstdlib>

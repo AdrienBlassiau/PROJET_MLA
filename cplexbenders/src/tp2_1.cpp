@@ -1,3 +1,7 @@
+///////////////////////////////////////
+// Modèle de base sans décomposition //
+///////////////////////////////////////
+
 #include "CuttingPlanesEngine.h"
 #include <iostream>
 #include <cstdlib>

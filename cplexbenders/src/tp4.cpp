@@ -1,3 +1,7 @@
+/////////////////////////////
+// Résolution ultra-rapide //
+/////////////////////////////
+
 #include "CuttingPlanesEngine.h"
 #include <iostream>
 #include <cstdlib>
@@ -27,23 +31,68 @@ void loadData(int nn, int benders){
     }
 }
 
-//étant donnée la solution courante y, trouver une contrainte violée
-//a^T y >= d et renvoyer a^T y - d. Remplir vecteur a et valeur d!!
+int bmax = INT_MIN;
+int *v_sol ;
 double separateFunc (const int n, double*y, double * a, double&rHand)
 {
+    double objVal;
+
+    // TEST RESOLUTION RAPIDE
+    int sum_y = 0;
+
+    for(int i=0;i<n-1;i++){
+        sum_y += y[i];
+    }
+
+    cout << "sum y : "<<sum_y << endl;
+    cout << "d : "<<d << endl;
+
+    if (sum_y == d){
+        printf("Resolution rapide\n");
+        objVal = 0;
+        for(int i=0;i<n-1;i++){
+            objVal += y[i]*c[i];
+        }
+
+        if(bmax==INT_MIN){
+            bmax=c[0];
+            for(int i=1;i<n-1;i++)
+                if(c[i]>bmax)
+                    bmax=c[i];
+            v_sol = new int[n];
+            for(int i=0;i<n-1;i++)
+                v_sol[i] = bmax-c[i];
+        }
+        for(int i=0;i<n-1;i++)
+            a[i]=v_sol[i];
+        a[n-1] = 1;
+
+        rHand = d*bmax;
+
+        return -objVal+y[n-1];
+    }
+
     cout<<"Starting sep function 1...";
     cout.flush();
     COUT("Cutting y=");
     for(int i=0;i<n;i++)
         COUT(y[i]<<" ");
     COUT(endl);
-    IloEnv env;
-    IloModel model(env);
 
-    IloNumVarArray v(env, n, 0, INT_MAX);
+    IloEnv env;
+
+    // -----------------------MODELE  -----------------------
+    IloModel model(env, "exo1");
+
+
+    // -----------------------VARIABLES  -----------------------
+    IloNumVarArray v(env, n-1, 0, INT_MAX);
+    IloNumVar b(env, INT_MIN, INT_MAX);
     IloExpr obj(env);
 
-    obj =  d*v[n-1];
+
+    // -----------------------OBJECTIF  -----------------------
+    obj =  d*b;
 
     for(int i=0;i<n-1;i++){
         obj+= -y[i] * v[i];
@@ -52,23 +101,31 @@ double separateFunc (const int n, double*y, double * a, double&rHand)
     IloObjective ilo_obj(env, obj, IloObjective::Maximize);
     model.add(ilo_obj);
 
+    // -----------------------CONTRAINTES  -----------------------
     for (int i=0;i<n-1;i++){
-        model.add(v[n-1] - v[i] <= c[i]);
+        model.add(b - v[i] <= c[i]);
     }
 
+    // -----------------------SOLVE  1 ----------------------
     IloCplex cplex(model);
     cplex.exportModel("model.lp");
     cplex.solve();
 
-    IloNumArray newvals(env,n);
+    // -----------------------SOLVE  2 ----------------------
+    IloNumArray newvals(env,n-1);
+    // IloNum value;
+
     for(int i=0;i<n-1;i++){
         if(y[i]<0.1)
             newvals[i] = -1;
         else
             newvals[i] = 0;
     }
-    newvals[n-1]=0;
+    // value=0;
+
     ilo_obj.setLinearCoefs(v,newvals);
+    // ilo_obj.setLinearCoef(b,value);
+
     obj.end();
     model.add(ilo_obj);
     cout<<"solving again.."<<flush;
@@ -77,105 +134,19 @@ double separateFunc (const int n, double*y, double * a, double&rHand)
     ilo_obj.end();
     newvals.end();
 
-
+    // -----------------------RETOUR  ----------------------
     IloNumArray vals(env);
     cplex.getValues(vals, v);
 
-
-    for (int i = 0; i < n; ++i){
-        printf("vals[%d] = %f\n",i,vals[i]);
-    }
-
-    rHand = d*vals[n-1];
-
-    printf("rHand : %f\n",rHand);
-    double objVal = rHand;
-    for(int i=0;i<n-1;i++){
-        a[i]=vals[i];
-        objVal-=a[i]*y[i];
-    }
-    a[n-1]=1;
-
-    cout<<"objValSep2="<<objVal<<endl;
-    return -objVal+y[n-1];
-}
-
-int bmax = INT_MIN;
-int *v_sol ;
-int cmax = INT_MIN;
-int *a_unique ;
-double separateFunc2 (const int n, double*y, double * a, double&rHand){
-	double objVal;
-
-	// TEST RESOLUTION RAPIDE
-	int sum_y = 0;
-
-    for(int i=0;i<n-1;i++){
-    	sum_y += y[i];
-    }
-
-    cout << "sum y : "<<sum_y << endl;
-    cout << "d : "<<d << endl;
-
-    if (sum_y == d){
-    	printf("Resolution rapide\n");
-    	objVal = 0;
-    	for(int i=0;i<n-1;i++){
-    		objVal += y[i]*c[i];
-    	}
-
-    	if(bmax==INT_MIN){
-        	bmax=c[0];
-        	for(int i=1;i<n-1;i++)
-            	if(c[i]>bmax)
-                	bmax=c[i];
-        	v_sol = new int[n];
-        	for(int i=0;i<n-1;i++)
-            	v_sol[i] = bmax-c[i];
-    	}
-    	for(int i=0;i<n-1;i++)
-        	a[i]=v_sol[i];
-        a[n-1] = 1;
-
-        rHand = d*bmax;
-
-    	return -objVal+y[n-1];
-    }
-
-    COUT("Cutting y=");
-    for(int i=0;i<n;i++)
-        COUT(y[i]<<" ");
-    COUT(endl);
-    if(cmax==INT_MIN){
-        cmax=c[0];
-        for(int i=1;i<n-1;i++)
-            if(c[i]>cmax)
-                cmax=c[i];
-        a_unique = new int[n];
-        for(int i=0;i<n-1;i++)
-            a_unique[i] = cmax-c[i];
-    }
-    for(int i=0;i<n-1;i++)
-        a[i]=a_unique[i];
-    a[n-1] = 1;
-    printf("CMAX = %d\n",cmax);
-    rHand = d*cmax;
-
-    COUT("Separation sub-problem form 1 finds:");
-    for(int i=0;i<n;i++)
-        if(a[i]!=0)
-            COUT(a[i]<<"y_"<<(i+1)<<"+");
-    COUT(">="<<rHand<<"-w"<<endl);
-    COUT(endl);
+    rHand = d*cplex.getValue(b);
 
     objVal = rHand;
     for(int i=0;i<n-1;i++){
-        objVal-=a[i]*y[i];
+        a[i]=vals[i];
+        objVal-=y[i]*vals[i];
     }
+    a[n-1]=1;
 
-    cout<<"RHand : "<<rHand<<endl;
-
-    cout<<"objValSep2="<<objVal<<endl;
     return -objVal+y[n-1];
 }
 
@@ -191,7 +162,7 @@ int main(int argc, char**  argv)
     double finalObj, time;
 
     //construire l'objet de plans coupants avec fonc de séparation
-    CuttingPlanesEngine cutPlanes(n,separateFunc2);
+    CuttingPlanesEngine cutPlanes(n,separateFunc);
     cutPlanes.setObjCoefsMinimize(f);
     cutPlanes.turnAllVarsInteger();
     // cutPlanes.activateLog();              //voir messages de log
