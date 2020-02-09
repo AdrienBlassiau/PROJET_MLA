@@ -45,7 +45,7 @@ double separateFunc (const int n, double*y, double * a, double&rHand)
     IloEnv env;
 
     // -----------------------MODELE  -----------------------
-    IloModel model(env, "exo1");
+    IloModel model(env, "model_tp2_2");
 
 
     // -----------------------VARIABLES  -----------------------
@@ -71,7 +71,7 @@ double separateFunc (const int n, double*y, double * a, double&rHand)
 
     // -----------------------SOLVE  1 ----------------------
     IloCplex cplex(model);
-    cplex.exportModel("model.lp");
+    cplex.exportModel("model_tp2_2.lp");
     cplex.solve();
 
     // -----------------------SOLVE  2 ----------------------

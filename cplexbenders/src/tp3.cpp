@@ -43,7 +43,7 @@ int main(int argc, char**  argv)
     IloEnv env;
     try{
         // -----------------------MODELE  -----------------------
-        IloModel model(env, "exo 2");
+        IloModel model(env, "model_tp3");
 
 
         // -----------------------VARIABLES  -----------------------
@@ -94,7 +94,7 @@ int main(int argc, char**  argv)
         // -----------------------SOLVE  ----------------------
 
         IloCplex cplex(model);
-        cplex.exportModel("model.lp");
+        cplex.exportModel("model_tp3.lp");
         cplex.setParam(IloCplex::Param::Benders::Strategy,IloCplex::BendersFull);
         cplex.solve();
 
