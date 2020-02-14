@@ -17,7 +17,7 @@ Chaque exercice possède son propre exécutable :
 
 # 2. Résultats obtenus
 
-## Exercice 1 et 2
+## Exercices 1 et 2
 
 La machine utilisée pour les tests possède **8 GO de ram** et un **processeur i5**. On utilise cplex 12.8 sur les instances fournies.
 
@@ -77,12 +77,12 @@ On a implémenté le programme linéaire. Les solutions obtenues pour une **band
 | benders1.txt                | solution obtenue           | temps total (s) |
 |-----------------------------|----------------------------|-----------------|
 | BENDERS                     | 688                        | 0.14121         |
-| PL                          | 688                        | 0.01            |      
+| PL                          | 688                        | 0.01            | 
+
 | benders2.txt                | solution obtenue           | temps total (s) |
 |-----------------------------|----------------------------|-----------------|
 | BENDERS                     | 390                        | 0.307605        |
 | PL                          | 390                        | 0.04            |      
-
 | benders3.txt                | solution obtenue           | temps total (s) |
 |-----------------------------|----------------------------|-----------------|
 | BENDERS                     | 579                        | 7.45729         |
