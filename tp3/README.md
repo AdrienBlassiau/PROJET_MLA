@@ -82,11 +82,12 @@ On a implémenté le programme linéaire. Les solutions obtenues pour une **band
 | benders2.txt                | solution obtenue           | temps total (s) |
 |-----------------------------|----------------------------|-----------------|
 | BENDERS                     | 390                        | 0.307605        |
-| PL                          | 390                        | 0.04            |      
+| PL                          | 390                        | 0.04            |
+      
 | benders3.txt                | solution obtenue           | temps total (s) |
 |-----------------------------|----------------------------|-----------------|
 | BENDERS                     | 579                        | 7.45729         |
-| PL                          | 579                        | 0.04            |       
+| PL                          | 579                        | 0.04            |
 
 | benders4.txt                | solution obtenue           | temps total (s) |
 |-----------------------------|----------------------------|-----------------|
