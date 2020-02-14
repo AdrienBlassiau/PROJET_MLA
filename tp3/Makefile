@@ -74,8 +74,6 @@ cplexdirexists:
 	if [ -d "$(CPLEX)" ]; then echo -e "\nCplex dir found. I'll compile main if not already compiled."; else echo -e "\n\nCplex dir not found!!!!! \nPlease set add a line like below on \nCPLEX=/path/to/your/cplex/install/folder/\nat the beginning of this Makefile"; exit 1; fi
 exo1:CuttingPlanesEngine.o src/exo1.cpp
 	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/exo1.cpp -o exo1 $(CCLNFLAGSCPLEX)
-exo1_bis:CuttingPlanesEngine.o src/exo1_bis.cpp
-	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/exo1_bis.cpp -o exo1_bis $(CCLNFLAGSCPLEX)
 exo2:CuttingPlanesEngine.o src/exo2.cpp
 	$(CCC) $(CCFLAGSCPLEX) CuttingPlanesEngine.o src/exo2.cpp -o exo2 $(CCLNFLAGSCPLEX)
 exo3:CuttingPlanesEngine.o src/exo3.cpp

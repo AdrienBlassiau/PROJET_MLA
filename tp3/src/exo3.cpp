@@ -1,13 +1,11 @@
-///////////////////
-// EXO3 DIJKSTRA //
-///////////////////
+/////////////
+// EXO3 PL //
+/////////////
 
 #include "CuttingPlanesEngine.h"
 #include <iostream>
 #include <cstdlib>
 #include <ilcplex/ilocplex.h>
-#include <limits.h>
-#include <stdio.h>
 #define EPSILON 1.0e-6
 #define COUT(x) {}
 #define COUT2(x) {cout<<x;}
@@ -19,57 +17,6 @@ int* b;         //demandes
 int**mat;       //matrice d'adjacence
 int* aretes[2]; //m arêtes, chacune avec deux sommets
 int bnd = 1;
-
-int minDistance(int dist[], bool sptSet[])
-{
-    // Initialize min value
-    int min = INT_MAX, min_index;
-
-    for (int v = 0; v < n; v++)
-        if (sptSet[v] == false && dist[v] <= min)
-            min = dist[v], min_index = v;
-
-    return min_index;
-}
-
-int printSolution(int dist[])
-{
-    printf("Vertex \t\t Distance from Source\n");
-    double sol = 0;
-    for (int i = 0; i < n; i++){
-        if (b[i]>1.0e-6){
-            sol+=dist[i];
-            printf("%d \t\t %d\n", i, dist[i]);
-        }
-    }
-    printf("Solution : %f\n",sol);
-}
-
-void dijkstra(int src)
-{
-    int dist[n];
-
-    bool sptSet[n];
-
-    for (int i = 0; i < n; i++)
-        dist[i] = INT_MAX, sptSet[i] = false;
-
-    dist[src] = 0;
-
-    for (int count = 0; count < n - 1; count++) {
-        int u = minDistance(dist, sptSet);
-
-        sptSet[u] = true;
-
-        for (int v = 0; v < n; v++)
-
-            if (!sptSet[v] && mat[u][v] && dist[u] != INT_MAX
-                && dist[u] + mat[u][v] < dist[v])
-                dist[v] = dist[u] + mat[u][v];
-    }
-
-    printSolution(dist);
-}
 
 int main(int argc, char const *argv[])
 {
@@ -127,7 +74,106 @@ int main(int argc, char const *argv[])
         cout<<i<<" veut "<<b[i]<<"; ";
     cout<<endl;
 
-    dijkstra(0);
 
+    IloEnv env;
+    try{
+        // -----------------------MODELE  -----------------------
+        IloModel model(env, "model_tp2_bis");
+
+
+        // -----------------------VARIABLES  -----------------------
+        IloNumVarArray y(env, m, 0, INT_MAX,ILOINT);
+        IloNumVarArray x(env, n*n, 0, INT_MAX);
+        IloExpr obj(env);
+
+        // -----------------------OBJECTIF  -----------------------
+        for(int i=0;i<m;i++){
+            obj+= y[i];
+        }
+
+        IloObjective ilo_obj(env, obj, IloObjective::Minimize);
+        model.add(ilo_obj);
+
+
+        // -----------------------CONTRAINTES  -----------------------
+
+        for (int i = 0; i<n; ++i){
+            for (int j = 0; j<n; ++j){
+                model.add(x[i+(n-1)*j]>= 0);
+            }
+        }
+        // CONTRAINTE b et c
+        for (int i=0;i<n;i++){
+            IloExpr s1(env) ;
+            IloExpr s2(env) ;
+            IloExpr s3(env) ;
+            IloExpr s4(env) ;
+            if (i!=0){
+                for (int j=0;j<n;j++){
+                    if (mat[i][j] == 1){
+                        if (b[i]==0){
+                            s1 += x[j+(n-1)*i];
+                            s2 += x[i+(n-1)*j];
+                        }
+                        else{
+                            s3 += x[j+(n-1)*i];
+                            s4 += x[i+(n-1)*j];
+                        }
+                    }
+                }
+
+                if (b[i]==0){
+                    model.add(s1-s2 >= 0);
+                }
+                else{
+                    model.add(s3-s4 >= b[i]);
+                }
+
+            }
+        }
+
+        // CONTRAINTE d
+        int i_j = 0;
+        for (int i=0;i<n;i++){
+            for (int j=i;j<n;j++){
+                if (mat[i][j] == 1){
+                    IloConstraint c(bnd*y[i_j]-x[i+(n-1)*j]-x[j+(n-1)*i] >= 0);
+                    c.setName("1d");
+                    model.add(c);
+                    i_j++;
+                }
+            }
+        }
+
+        // -----------------------SOLVE  ----------------------
+
+        IloCplex cplex(model);
+        // cplex.setParam(IloCplex::Param::Benders::Strategy,IloCplex::BendersFull);
+        cplex.solve();
+
+
+        // -----------------------AFFICHAGE  ----------------------
+        IloNumArray valsy(env);
+        // IloNumArray valsx(env);
+        cplex.getValues(valsy, y);
+        // cplex.getValues(valsx, x);
+
+        cout<<endl<<"############## RESULTATS #############"<<endl;
+        cout<<"\nObj="<<cplex.getObjValue()<<endl;;
+
+        for (int i = 0; i < m; ++i){
+            if (valsy[i]>1.0e-6){
+                cout<<"y["<<i<<"]="<<valsy[i]<<"; ";
+            }
+        }
+        cout<<endl;
+
+        cout<<"Temps d'execution : "<<cplex.getTime()<<endl;
+    }
+    catch(IloException& e) {
+        cerr << " ERREUR : exception = "<< e << endl;
+    }
+
+    env.end();
     return 0;
 }

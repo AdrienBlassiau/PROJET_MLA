@@ -1,6 +1,6 @@
-//////////////////
-// EXO1 Benders //
-//////////////////
+/////////////////////////
+// EXO1 Benders entier //
+/////////////////////////
 
 #include "CuttingPlanesEngine.h"
 #include <iostream>
@@ -16,7 +16,7 @@ int  m;         //no arêtes
 int* b;         //demandes
 int** mat;       //matrice d'adjacence
 int* aretes[2]; //m arêtes, chacune avec deux sommets
-int bnd = 3;
+int bnd = 1;
 
 double separateFunc (const int m, double*y, double * a, double&rHand)
 {
@@ -27,6 +27,11 @@ double separateFunc (const int m, double*y, double * a, double&rHand)
     // for(int i=0;i<m;i++)
     //     cout<<y[i]<<" ";
     // cout<<endl;
+
+    double res=0;
+    for(int i=0;i<m;i++)
+        res+=y[i];
+    printf("CUR RES : %f\n",res);
 
     IloEnv env;
 
@@ -107,7 +112,7 @@ double separateFunc (const int m, double*y, double * a, double&rHand)
 
     double objVal = rHand;
     for(int i=0;i<m;i++){
-        a[i] = vals[i];
+        a[i] = bnd*vals[i];
         // printf("a[%d] = %f\n",i,a[i]);
         // printf("bnd,y[%d]: %f,vals[%d] : %f\n",i,cur_y,i,vals[i]);
         objVal -= bnd*y[i]*vals[i];

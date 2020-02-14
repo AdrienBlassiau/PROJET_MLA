@@ -1,6 +1,6 @@
-//////////////////
-// EXO2 Benders //
-//////////////////
+////////////////////////////////////////////////////
+// EXO2 Benders fractionnaire puis Benders entier //
+////////////////////////////////////////////////////
 
 #include "CuttingPlanesEngine.h"
 #include <iostream>
@@ -16,7 +16,7 @@ int  m;         //no arêtes
 int* b;         //demandes
 int** mat;       //matrice d'adjacence
 int* aretes[2]; //m arêtes, chacune avec deux sommets
-int bnd = 3;
+int bnd = 1;
 
 double separateFunc (const int m, double*y, double * a, double&rHand)
 {
@@ -27,6 +27,12 @@ double separateFunc (const int m, double*y, double * a, double&rHand)
     // for(int i=0;i<m;i++)
     //     cout<<y[i]<<" ";
     // cout<<endl;
+
+    double res=0;
+    for(int i=0;i<m;i++)
+        res+=y[i];
+    printf("CUR OBJ : %f\n",res);
+
 
     IloEnv env;
 
@@ -87,7 +93,7 @@ double separateFunc (const int m, double*y, double * a, double&rHand)
     }
     // // -----------------------SOLVE  1 ----------------------
     IloCplex cplex(model);
-    cplex.exportModel("model_tp1.lp");
+    // cpleOBJx.exportModel("model_tp1.lp");
     cplex.solve();
 
 
@@ -107,12 +113,12 @@ double separateFunc (const int m, double*y, double * a, double&rHand)
 
     double objVal = rHand;
     for(int i=0;i<m;i++){
-        a[i] = vals[i];
+        a[i] = bnd*vals[i];
         // printf("a[%d] = %f\n",i,a[i]);
         // printf("bnd,y[%d]: %f,vals[%d] : %f\n",i,cur_y,i,vals[i]);
         objVal -= bnd*y[i]*vals[i];
     }
-
+    env.end();
     // printf("rHand : %f\n",rHand);
     // printf("objVal : %f\n",objVal);
     return -objVal;
